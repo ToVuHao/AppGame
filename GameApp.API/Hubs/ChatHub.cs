@@ -7,6 +7,8 @@ using System.Linq;
 
 namespace GameApp.API.Hubs
 {
+
+    //HELooo chathub
     public class ChatHub : Hub
     {
         private readonly GameDbContext _context;
