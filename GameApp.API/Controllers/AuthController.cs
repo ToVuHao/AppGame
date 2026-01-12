@@ -19,8 +19,13 @@ namespace GameApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] User user)
         {
+            // Kiểm tra tài khoản tồn tại
             if (await _context.Users.AnyAsync(u => u.Username == user.Username))
                 return BadRequest("Tài khoản đã tồn tại");
+
+            // BẢO MẬT: Mặc định đăng ký mới luôn là "user"
+            // (Chỉ sửa thành "admin" trực tiếp trong Database)
+            user.Role = "user";
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -36,7 +41,14 @@ namespace GameApp.API.Controllers
             if (user == null)
                 return Unauthorized("Sai tài khoản hoặc mật khẩu");
 
-            return Ok(new { Message = "Đăng nhập thành công", UserId = user.Id, Name = user.FullName });
+            // QUAN TRỌNG: Trả về Role để Flutter phân quyền
+            return Ok(new
+            {
+                Message = "Đăng nhập thành công",
+                UserId = user.Id,
+                FullName = user.FullName,
+                Role = user.Role // <-- Dòng này giúp App biết vào Admin hay Home
+            });
         }
     }
 }
